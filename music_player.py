@@ -15,26 +15,40 @@ class Window(QtWidgets.QWidget):
         self.shuffle_button = QtWidgets.QPushButton("🔀")
         self.l_playlists = QtWidgets.QLabel("Playlists")
         self.l_current_song = QtWidgets.QLabel("Current song")
-        #self.songs = QtWidgets.QLabel("Songs: \n1. \n2. \n3. \n4. \n5.")
+        self.songs = QtWidgets.QLabel("Songs: \n1. \n2. \n3. \n4. \n5.")
 
-        self.l_playlists.setGeometry(50,50,100,10)
+        h_box1 = QtWidgets.QHBoxLayout()
+        v_box1 = QtWidgets.QVBoxLayout()
 
-        h_box = QtWidgets.QHBoxLayout()
-        v_box = QtWidgets.QVBoxLayout()
-        v_box.addWidget(self.all_song_button)
-        v_box.addWidget(self.l_playlists)
-        v_box.addWidget(self.l_current_song)
-        #v_box.addWidget(self.songs)
+        v_box1.addWidget(self.all_song_button)
+        v_box1.addWidget(self.l_playlists)
+        v_box1.addWidget(self.l_current_song)
 
-        h_box.addLayout(v_box)
+        h_box1.addLayout(v_box1)
 
-        h_box.addWidget(self.shuffle_button)
+        v_box2 = QtWidgets.QVBoxLayout()
+        v_box2.addWidget(self.songs)
 
-        h_box.addWidget(self.prev_button)
-        h_box.addWidget(self.play_button)
-        h_box.addWidget(self.next_button)
+        h_box1.addLayout(v_box2)
 
-        self.setLayout(h_box)
+        h_box2 = QtWidgets.QHBoxLayout()
+        h_box2.addWidget(self.shuffle_button)
+
+        h_box3 = QtWidgets.QHBoxLayout()
+        h_box3.addWidget(self.prev_button)
+
+        h_box4 = QtWidgets.QHBoxLayout()
+        h_box4.addWidget(self.play_button)
+
+        h_box5 = QtWidgets.QHBoxLayout()
+        h_box5.addWidget(self.next_button)
+
+        v_box2.addLayout(h_box2)
+        v_box2.addLayout(h_box3)
+        v_box2.addLayout(h_box4)
+        v_box2.addLayout(h_box5)
+
+        self.setLayout(h_box1)
 
         self.setWindowTitle("Music Player")
         self.setGeometry(100, 100, 800, 600)
