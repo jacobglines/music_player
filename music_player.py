@@ -23,6 +23,17 @@ class Window(QtWidgets.QWidget):
         self.line_edit.setText("Search")
         self.search_button = QtWidgets.QPushButton("search")
 
+        self.player = M.QMediaPlayer(self)
+        self.playlist = M.QMediaPlaylist(self.player)
+        print(self.all_songs)
+        for song in self.all_songs:
+            url = C.QUrl.fromLocalFile(song[:-1])
+            print(url)
+            content = M.QMediaContent(url)
+            self.playlist.addMedia(content)
+        self.playlist.setCurrentIndex(0)
+        self.player.setPlaylist(self.playlist)
+
         h_box = QtWidgets.QHBoxLayout()
         v_box = QtWidgets.QVBoxLayout()
 
@@ -60,10 +71,12 @@ class Window(QtWidgets.QWidget):
         self.setGeometry(100, 100, 800, 600)
         self.show()
         self.play_button.clicked.connect(self.play)
+        self.next_button.clicked.connect(self.next)
+        self.prev_button.clicked.connect(self.back)
 
     def load_songs(self):
         songList = []
-        s = ''
+        s = 'Songs:\n'
         songs = os.listdir("/Users/jacobglines/Desktop/Programming/music_player/songs")
         for item in songs:
             s += (str(item[:-4]) + '\n')
@@ -73,14 +86,17 @@ class Window(QtWidgets.QWidget):
         return songList
 
     def play(self):
-        url = C.QUrl.fromLocalFile("/Users/jacobglines/Desktop/Programming/music_player/songs/Apologize.mp3")
-        content = M.QMediaContent(url)
-        player = M.QMediaPlayer(self)
-        playlist = M.QMediaPlaylist(player)
-        playlist.addMedia(content)
-        playlist.setCurrentIndex(0)
-        player.setPlaylist(playlist)
-        player.play()
+        self.player.play()
+
+    def next(self):
+        numb = self.playlist.currentIndex()
+        self.playlist.setCurrentIndex(numb + 1)
+        self.player.play()
+
+    def back(self):
+        numb = self.playlist.currentIndex()
+        self.playlist.setCurrentIndex(numb - 1)
+        self.player.play()
 
 app = QtWidgets.QApplication(sys.argv)
 window = Window()
