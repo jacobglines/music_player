@@ -2,7 +2,7 @@ import sys
 from PyQt5 import QtWidgets
 import PyQt5.QtCore as C
 import PyQt5.QtMultimedia as M
-
+import os
 
 class Window(QtWidgets.QWidget):
     def __init__(self):
@@ -17,7 +17,8 @@ class Window(QtWidgets.QWidget):
         self.shuffle_button = QtWidgets.QPushButton("🔀")
         self.l_playlists = QtWidgets.QLabel("Playlists")
         self.l_current_song = QtWidgets.QLabel("Current song")
-        self.songs = QtWidgets.QLabel("Songs: \n1. \n2. \n3. \n4. \n5.")
+        self.songs = QtWidgets.QLabel("Songs:\n")
+        self.all_songs = self.load_songs()
         self.line_edit = QtWidgets.QLineEdit()
         self.line_edit.setText("Search")
         self.search_button = QtWidgets.QPushButton("search")
@@ -60,20 +61,26 @@ class Window(QtWidgets.QWidget):
         self.show()
         self.play_button.clicked.connect(self.play)
 
+    def load_songs(self):
+        songList = []
+        s = ''
+        songs = os.listdir("/Users/jacobglines/Desktop/Programming/music_player/songs")
+        for item in songs:
+            s += (str(item[:-4]) + '\n')
+            song = ('/Users/jacobglines/Desktop/Programming/music_player/songs/' + item + '\n')
+            songList.append(song)
+        self.songs.setText(s)
+        return songList
+
     def play(self):
-        #
-        # Currently doesn't work
-        #
-        url = C.QUrl.fromLocalFile("/Users/jacobglines/Desktop/Programming/music_player/songs/Maroon 5 - She Will Be Loved.mp3")
+        url = C.QUrl.fromLocalFile("/Users/jacobglines/Desktop/Programming/music_player/songs/Apologize.mp3")
         content = M.QMediaContent(url)
-        player = M.QMediaPlayer()
-        player.setVolume(75)
-        player.setMedia(content)
+        player = M.QMediaPlayer(self)
+        playlist = M.QMediaPlaylist(player)
+        playlist.addMedia(content)
+        playlist.setCurrentIndex(0)
+        player.setPlaylist(playlist)
         player.play()
-        #
-        # Only works for .wav files
-        #
-        M.QSound.play("/Users/jacobglines/Desktop/dog_growl3.wav")
 
 app = QtWidgets.QApplication(sys.argv)
 window = Window()
