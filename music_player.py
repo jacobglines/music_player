@@ -37,22 +37,7 @@ class Window(QtWidgets.QWidget):
         self.scroll_area.setVerticalScrollBar(self.scroll_bar)
         self.scroll_area.setVerticalScrollBarPolicy(C.Qt.ScrollBarAlwaysOn)
 
-        self.player = M.QMediaPlayer(self)
-        self.player2 = M.QMediaPlayer(self)
-        self.playlist = M.QMediaPlaylist(self.player)
-        self.playlist2 = M.QMediaPlaylist(self.player2)
-        print(self.all_songs)
-        for song in self.all_songs:
-            url = C.QUrl.fromLocalFile(song[:-1])
-            print(url)
-            content = M.QMediaContent(url)
-            self.playlist.addMedia(content)
-            self.playlist2.addMedia(content)
-        self.playlist.setCurrentIndex(0)
-        self.playlist2.shuffle()
-        self.playlist2.setCurrentIndex(0)
-        self.player.setPlaylist(self.playlist)
-        self.player2.setPlaylist(self.playlist2)
+        self.set_playlist()
         self.volume_change()
 
         h_box = QtWidgets.QHBoxLayout()
@@ -104,13 +89,31 @@ class Window(QtWidgets.QWidget):
     def load_songs(self):
         songList = []
         s = 'Songs:\n\n'
-        songs = os.listdir("/Users/jacobglines/Desktop/Programming/music_player/songs")
+        root = C.QFileInfo(__file__).absolutePath()
+        songs = os.listdir(root + "/songs")
         for item in songs:
+            print(item)
             s += (str(item[:-4]) + '\n')
-            song = ('/Users/jacobglines/Desktop/Programming/music_player/songs/' + item + '\n')
+            song = (root + '/songs/' + item + '\n')
             songList.append(song)
         self.songs.setText(s)
         return songList
+
+    def set_playlist(self):
+        self.player = M.QMediaPlayer(self)
+        self.player2 = M.QMediaPlayer(self)
+        self.playlist = M.QMediaPlaylist(self.player)
+        self.playlist2 = M.QMediaPlaylist(self.player2)
+        for song in self.all_songs:
+            url = C.QUrl.fromLocalFile(song[:-1])
+            content = M.QMediaContent(url)
+            self.playlist.addMedia(content)
+            self.playlist2.addMedia(content)
+        self.playlist.setCurrentIndex(0)
+        self.playlist2.shuffle()
+        self.playlist2.setCurrentIndex(0)
+        self.player.setPlaylist(self.playlist)
+        self.player2.setPlaylist(self.playlist2)
 
     def play(self):
         if self.shuffled == False:
@@ -165,8 +168,3 @@ class Window(QtWidgets.QWidget):
 
     def search(self):
         pass
-
-
-app = QtWidgets.QApplication(sys.argv)
-window = Window()
-sys.exit(app.exec_())

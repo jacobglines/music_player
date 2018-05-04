@@ -1,6 +1,9 @@
 import sys
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QAction
+from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtWidgets import QAction, QFileDialog
+from music_player import Window
+import os
+from shutil import copy
 
 
 class MenuBar(QtWidgets.QMainWindow):
@@ -13,6 +16,9 @@ class MenuBar(QtWidgets.QMainWindow):
         extractAction.setShortcut("Ctrl+F")
         extractAction.triggered.connect(self.open_file)
 
+        self.window = Window()
+        self.setCentralWidget(self.window)
+
         mainMenu = self.menuBar()
         fileMenu = mainMenu.addMenu("File")
         fileMenu.addAction(extractAction)
@@ -20,8 +26,22 @@ class MenuBar(QtWidgets.QMainWindow):
         self.show()
 
     def open_file(self):
-        pass
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+                                                "WAV Files (*.wav);;MP3 Files (*.mp3)", options=options)
+        root = QtCore.QFileInfo(__file__).absolutePath()
+        songs = (root + '/songs/')
+        copy(fileName, songs)
+        self.window.load_songs()
+        self.window.set_playlist()
+        print(self.window.playlist)
+        self.update()
 
-app = QtWidgets.QMainWindow(sys.argv)
+
+
+
+
+app = QtWidgets.QApplication(sys.argv)
 window = MenuBar()
 sys.exit(app.exec_())
