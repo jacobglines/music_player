@@ -87,7 +87,4 @@ class Window(QtWidgets.QWidget):
         player.setPlaylist(playlist)
         player.play()
 
-app = QtWidgets.QApplication(sys.argv)
-window = Window()
-sys.exit(app.exec_())
 
