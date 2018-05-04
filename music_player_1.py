@@ -24,4 +24,6 @@ class MenuBar(QtWidgets.QMainWindow):
         self.show()
 
     def open_file(self):
-        pass
+        name = QtWidgets.QFileDialog.getOpenFileName(self, 'Open File')
+        file = open(name, 'r')
+        file.close()
