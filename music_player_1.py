@@ -2,7 +2,6 @@ import sys
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QAction, QFileDialog
 from music_player import Window
-import os
 from shutil import copy
 
 
