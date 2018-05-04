@@ -1,6 +1,7 @@
 import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QAction
+from example import Interface
 
 
 class MenuBar(QtWidgets.QMainWindow):
@@ -13,6 +14,9 @@ class MenuBar(QtWidgets.QMainWindow):
         extractAction.setShortcut("Ctrl+F")
         extractAction.triggered.connect(self.open_file)
 
+        window = Interface()
+        self.setCentralWidget(window)
+
         mainMenu = self.menuBar()
         fileMenu = mainMenu.addMenu("File")
         fileMenu.addAction(extractAction)
@@ -21,7 +25,3 @@ class MenuBar(QtWidgets.QMainWindow):
 
     def open_file(self):
         pass
-
-app = QtWidgets.QMainWindow(sys.argv)
-window = MenuBar()
-sys.exit(app.exec_())
