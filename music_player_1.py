@@ -1,7 +1,7 @@
 import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QAction
-from example import Interface
+from music_player import Window
 
 
 class MenuBar(QtWidgets.QMainWindow):
@@ -14,7 +14,7 @@ class MenuBar(QtWidgets.QMainWindow):
         extractAction.setShortcut("Ctrl+F")
         extractAction.triggered.connect(self.open_file)
 
-        window = Interface()
+        window = Window()
         self.setCentralWidget(window)
 
         mainMenu = self.menuBar()
