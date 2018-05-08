@@ -10,50 +10,66 @@ class Window(QtWidgets.QWidget):
         super(Window, self).__init__(parent)
         self.user_interface()
 
-    def user_interface(self):
-        self.shuffled = False
+        def user_interface(self):
         self.all_song_button = QtWidgets.QPushButton("All songs")
         self.play_button = QtWidgets.QPushButton("\u25B6")
         self.next_button = QtWidgets.QPushButton("\u23E9")
         self.prev_button = QtWidgets.QPushButton("\u23EA")
         self.shuffle_button = QtWidgets.QPushButton("🔀")
-        self.l_playlists = QtWidgets.QLabel("Playlists")
-        self.l_current_song = QtWidgets.QLabel("Current song")
+        self.min_volumn = QtWidgets.QLabel("🔈")
+        self.max_volumn = QtWidgets.QLabel("🔊")
+        self.l_playlists = QtWidgets.QLabel("Playlists:")
+        self.l_current_song = QtWidgets.QLabel("Current song:")
         self.songs = QtWidgets.QLabel("Songs:\n")
         self.all_songs = self.load_songs()
         self.line_edit = QtWidgets.QLineEdit()
         self.line_edit.setText("🔎")
         self.search_button = QtWidgets.QPushButton("search")
-        self.scroll_area = QtWidgets.QScrollArea()
-        self.scroll_area.setWidget(self.songs)
-        self.slider = QtWidgets.QSlider()
-        self.slider.windowHandle()
-        self.slider.setFixedSize(20, 70)
-        self.slider.setMinimum(0)
-        self.slider.setMaximum(100)
-        self.slider.setValue(50)
-        self.slider.setTickInterval(5)
-        self.scroll_bar = QtWidgets.QScrollBar()
-        self.scroll_area.setVerticalScrollBar(self.scroll_bar)
-        self.scroll_area.setVerticalScrollBarPolicy(C.Qt.ScrollBarAlwaysOn)
+        #backGround = QImage("music-player-bg.png")
 
-        self.set_playlist()
-        self.volume_change()
+        #scroll are for list of songs
+        self.songs_scroll_area = QtWidgets.QScrollArea()
+        self.songs_scroll_area.setWidget(self.songs)
+        self.songs_scroll_bar = QtWidgets.QScrollBar()
+        self.songs_scroll_area.setVerticalScrollBar(self.songs_scroll_bar)
+        self.songs_scroll_area.setVerticalScrollBarPolicy(C.Qt.ScrollBarAlwaysOn)
+
+        #scroll area for list of playlists
+        self.playlists_scroll_area = QtWidgets.QScrollArea()
+        self.playlists_scroll_area.setWidget(self.l_playlists)
+        self.playlists_scroll_bar = QtWidgets.QScrollBar()
+        self.playlists_scroll_area.setVerticalScrollBar(self.playlists_scroll_bar)
+        self.playlists_scroll_area.setVerticalScrollBarPolicy(C.Qt.ScrollBarAlwaysOn)
+
+        #set area for current song box
+        self.current_song_area = QtWidgets.QScrollArea()
+        self.current_song_area.setWidget(self.l_current_song)
+
+        #set volumn slider
+        self.volumn_slider = QtWidgets.QSlider(C.Qt.Horizontal)
+        self.volumn_slider.setMaximum(100)
+        self.volumn_slider.setMinimum(0)
+        self.volumn_slider.setValue(50)
+        self.volumn_slider.setTickPosition(QtWidgets.QSlider.TicksRight)
+        self.volumn_slider.setTickInterval(10)
 
         h_box = QtWidgets.QHBoxLayout()
         v_box = QtWidgets.QVBoxLayout()
 
+        #h_box.addWidget(backGround)
+
         v_box.addWidget(self.all_song_button)
-        v_box.addWidget(self.l_playlists)
-        v_box.addWidget(self.l_current_song)
+        v_box.addWidget(self.playlists_scroll_area)
+        v_box.addWidget(self.current_song_area)
 
         h_box.addLayout(v_box)
 
         v_box1 = QtWidgets.QVBoxLayout()
         v_box1.addWidget(self.line_edit)
 
+
         v_box2 = QtWidgets.QVBoxLayout()
-        v_box2.addWidget(self.scroll_area)
+        v_box2.addWidget(self.songs_scroll_area)
 
         h_box.addLayout(v_box1)
 
@@ -62,7 +78,11 @@ class Window(QtWidgets.QWidget):
         h_box1.addWidget(self.prev_button)
         h_box1.addWidget(self.play_button)
         h_box1.addWidget(self.next_button)
-        h_box1.addWidget(self.slider)
+
+        h_box3 = QtWidgets.QHBoxLayout()
+        h_box3.addWidget(self.min_volumn)
+        h_box3.addWidget(self.volumn_slider)
+        h_box3.addWidget(self.max_volumn)
 
         h_box2 = QtWidgets.QHBoxLayout()
         h_box2.addWidget(self.search_button)
@@ -70,8 +90,11 @@ class Window(QtWidgets.QWidget):
         v_box1.addLayout(h_box2)
         v_box1.addLayout(v_box2)
         v_box1.addLayout(h_box1)
+        v_box1.addLayout(h_box3)
+
 
         self.setLayout(h_box)
+
 
         self.setWindowTitle("Music Player")
         self.setGeometry(100, 100, 800, 600)
