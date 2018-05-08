@@ -16,6 +16,8 @@ class Window(QtWidgets.QWidget):
         self.next_button = QtWidgets.QPushButton("\u23E9")
         self.prev_button = QtWidgets.QPushButton("\u23EA")
         self.shuffle_button = QtWidgets.QPushButton("🔀")
+        self.min_volumn = QtWidgets.QLabel("🔈")
+        self.max_volumn = QtWidgets.QLabel("🔊")
         self.l_playlists = QtWidgets.QLabel("Playlists")
         self.l_current_song = QtWidgets.QLabel("Current song")
         self.songs = QtWidgets.QLabel("Songs:\n")
@@ -24,6 +26,7 @@ class Window(QtWidgets.QWidget):
         self.line_edit = QtWidgets.QLineEdit()
         self.line_edit.setText("🔎")
         self.search_button = QtWidgets.QPushButton("search")
+        # backGround = QImage("music-player-bg.png")
 
         self.scroll_area = QtWidgets.QScrollArea()
         self.scroll_area.setWidget(self.songs)
@@ -31,18 +34,21 @@ class Window(QtWidgets.QWidget):
         self.scroll_area.setVerticalScrollBar(self.scroll_bar)
         self.scroll_area.setVerticalScrollBarPolicy(C.Qt.ScrollBarAlwaysOn)
 
+        # scroll area for list of songs
         self.songs_scroll_area = QtWidgets.QScrollArea()
         self.songs_scroll_area.setWidget(self.songs)
         self.songs_scroll_bar = QtWidgets.QScrollBar()
         self.songs_scroll_area.setVerticalScrollBar(self.songs_scroll_bar)
         self.songs_scroll_area.setVerticalScrollBarPolicy(C.Qt.ScrollBarAlwaysOn)
 
+        # scroll area for list of playlists
         self.playlists_scroll_area = QtWidgets.QScrollArea()
         self.playlists_scroll_area.setWidget(self.l_playlists)
         self.playlists_scroll_bar = QtWidgets.QScrollBar()
         self.playlists_scroll_area.setVerticalScrollBar(self.playlists_scroll_bar)
         self.playlists_scroll_area.setVerticalScrollBarPolicy(C.Qt.ScrollBarAlwaysOn)
 
+        # set are for current song box
         self.current_song_area = QtWidgets.QScrollArea()
         self.current_song_area.setWidget(self.l_current_song)
 
@@ -72,6 +78,8 @@ class Window(QtWidgets.QWidget):
         v_box = QtWidgets.QVBoxLayout()
         self.h_box4 = QtWidgets.QHBoxLayout()
 
+        #h_box.addWidget(backGround)
+
         v_box.addWidget(self.all_song_button)
         v_box.addWidget(self.playlists_scroll_area)
         v_box.addWidget(self.current_song_area)
@@ -95,7 +103,12 @@ class Window(QtWidgets.QWidget):
         h_box1.addWidget(self.prev_button)
         h_box1.addWidget(self.play_button)
         h_box1.addWidget(self.next_button)
-        h_box1.addWidget(self.slider)
+
+        v_box3 = QtWidgets.QVBoxLayout()
+        v_box3.addWidget(self.min_volumn)
+        v_box3.addWidget(self.slider)
+        v_box3.addWidget(self.max_volumn)
+        h_box1.addLayout(v_box3)
 
         h_box2 = QtWidgets.QHBoxLayout()
         h_box2.addWidget(self.search_button)
@@ -119,22 +132,6 @@ class Window(QtWidgets.QWidget):
         self.shuffle_button.clicked.connect(self.shuffle)
         self.search_button.clicked.connect(self.search)
         self.slider.valueChanged.connect(self.volume_change)
-        self.player.positionChanged.connect(self.qmp_positionChanged)
-        self.player.durationChanged.connect(self.change_duration)
-
-    def change_duration(self):
-        self.seekSlider.setRange(0, self.player.duration())
-        print('fdsfffffgfgfgf')
-
-    def seekPosition(self, position):
-        pass
-
-    def qmp_positionChanged(self, position):
-        sliderLayout = self.h_box4.layout()
-        sliderLayout.itemAt(0).widget().setText('%d:%02d' % (int(position / 60000), int((position / 1000) % 60)))
-        self.seekSlider.setValue(position / 1000)
-        print(self.player.duration())
-        sliderLayout.itemAt(2).widget().setText('%d:%02d' % (int(position / 60000), int((position / 1000) % 60)))
 
     def load_songs(self):
         songList = []
@@ -205,6 +202,7 @@ class Window(QtWidgets.QWidget):
             self.player2.play()
             self.shuffled = True
         elif self.shuffled == True:
+            print('hello')
             self.player2.stop()
             self.playlist.setCurrentIndex(0)
             self.player.play()
