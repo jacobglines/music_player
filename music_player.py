@@ -105,9 +105,7 @@ class Window(QtWidgets.QWidget):
         h_box1.addWidget(self.next_button)
 
         v_box3 = QtWidgets.QVBoxLayout()
-        v_box3.addWidget(self.min_volumn)
         v_box3.addWidget(self.slider)
-        v_box3.addWidget(self.max_volumn)
         h_box1.addLayout(v_box3)
 
         h_box2 = QtWidgets.QHBoxLayout()
@@ -132,6 +130,26 @@ class Window(QtWidgets.QWidget):
         self.shuffle_button.clicked.connect(self.shuffle)
         self.search_button.clicked.connect(self.search)
         self.slider.valueChanged.connect(self.volume_change)
+        self.player.positionChanged.connect(self.qmp_positionChanged)
+        self.player.durationChanged.connect(self.change_duration)
+
+
+    def change_duration(self):
+        self.seekSlider.setRange(0, self.player.duration())
+        print('fdsfffffgfgfgf')
+        print(self.seekSlider.maximum())
+
+
+    def seekPosition(self, position):
+        pass
+
+
+    def qmp_positionChanged(self, position):
+        sliderLayout = self.h_box4.layout()
+        sliderLayout.itemAt(0).widget().setText('%d:%02d' % (int(position / 60000), int((position / 1000) % 60)))
+        self.seekSlider.setValue(position / 1000)
+        print(self.player.duration())
+        sliderLayout.itemAt(2).widget().setText('%d:%02d' % (int(position / 60000), int((position / 1000) % 60)))
 
     def load_songs(self):
         songList = []
