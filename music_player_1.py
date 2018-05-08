@@ -38,9 +38,6 @@ class MenuBar(QtWidgets.QMainWindow):
         self.update()
 
 
-
-
-
 app = QtWidgets.QApplication(sys.argv)
 window = MenuBar()
 sys.exit(app.exec_())
