@@ -169,14 +169,18 @@ class Window(QtWidgets.QWidget):
     def play(self):
         if self.shuffled == False:
             if self.player.state() == 0 or self.player.state() == 2:
+                self.play_button.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
                 self.player.play()
             else:
                 self.player.pause()
+                self.play_button.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
         else:
             if self.player2.state() == 0 or self.player2.state() == 2:
+                self.play_button.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
                 self.player2.play()
             else:
                 self.player2.pause()
+                self.play_button.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
 
     def next(self):
         if self.shuffled == False:
