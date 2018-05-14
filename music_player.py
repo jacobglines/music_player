@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets
 import PyQt5.QtCore as C
 import PyQt5.QtMultimedia as M
 import os
+from PyQt5.QtWidgets import QStyle
 
 class Window(QtWidgets.QWidget):
 
