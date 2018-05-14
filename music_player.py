@@ -9,84 +9,68 @@ class Window(QtWidgets.QWidget):
         super(Window, self).__init__(parent)
         self.user_interface()
 
-    def user_interface(self):
-        self.shuffled = False
+        def user_interface(self):
         self.all_song_button = QtWidgets.QPushButton("All songs")
-        self.play_button = QtWidgets.QPushButton("\u25B6")
-        self.next_button = QtWidgets.QPushButton("\u23E9")
-        self.prev_button = QtWidgets.QPushButton("\u23EA")
+        self.play_button = QtWidgets.QPushButton()
+        self.play_button.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
+        self.next_button = QtWidgets.QPushButton()
+        self.next_button.setIcon(self.style().standardIcon(QStyle.SP_MediaSeekForward))
+        self.prev_button = QtWidgets.QPushButton()
+        self.prev_button.setIcon(self.style().standardIcon(QStyle.SP_MediaSeekBackward))
         self.shuffle_button = QtWidgets.QPushButton("🔀")
         self.min_volumn = QtWidgets.QLabel("🔈")
         self.max_volumn = QtWidgets.QLabel("🔊")
-        self.l_playlists = QtWidgets.QLabel("Playlists")
-        self.l_current_song = QtWidgets.QLabel("Current song")
+        self.l_playlists = QtWidgets.QLabel("Playlists:")
+        self.l_current_song = QtWidgets.QLabel("Current song:")
+
         self.songs = QtWidgets.QLabel("Songs:\n")
+
         self.all_songs = self.load_songs()
+
         self.set_playlist()
+
         self.line_edit = QtWidgets.QLineEdit()
         self.line_edit.setText("🔎")
         self.search_button = QtWidgets.QPushButton("search")
-        # backGround = QImage("music-player-bg.png")
 
-        self.scroll_area = QtWidgets.QScrollArea()
-        self.scroll_area.setWidget(self.songs)
-        self.scroll_bar = QtWidgets.QScrollBar()
-        self.scroll_area.setVerticalScrollBar(self.scroll_bar)
-        self.scroll_area.setVerticalScrollBarPolicy(C.Qt.ScrollBarAlwaysOn)
-
-        # scroll area for list of songs
+        #scroll are for list of songs
         self.songs_scroll_area = QtWidgets.QScrollArea()
         self.songs_scroll_area.setWidget(self.songs)
         self.songs_scroll_bar = QtWidgets.QScrollBar()
         self.songs_scroll_area.setVerticalScrollBar(self.songs_scroll_bar)
         self.songs_scroll_area.setVerticalScrollBarPolicy(C.Qt.ScrollBarAlwaysOn)
+        self.songs_scroll_area.setWidgetResizable(True)
+        self.songs_scroll_area.setAlignment(C.Qt.AlignTop)
 
-        # scroll area for list of playlists
+        #scroll area for list of playlists
         self.playlists_scroll_area = QtWidgets.QScrollArea()
         self.playlists_scroll_area.setWidget(self.l_playlists)
         self.playlists_scroll_bar = QtWidgets.QScrollBar()
         self.playlists_scroll_area.setVerticalScrollBar(self.playlists_scroll_bar)
         self.playlists_scroll_area.setVerticalScrollBarPolicy(C.Qt.ScrollBarAlwaysOn)
 
-        # set are for current song box
+        #set area for current song box
         self.current_song_area = QtWidgets.QScrollArea()
         self.current_song_area.setWidget(self.l_current_song)
 
-        self.slider = QtWidgets.QSlider()
-        self.slider.windowHandle()
-        self.slider.setFixedSize(20, 70)
-        self.slider.setMinimum(0)
-        self.slider.setMaximum(100)
-        self.slider.setValue(50)
-        self.slider.setTickInterval(5)
+        #set volumn slider
+        self.volumn_slider = QtWidgets.QSlider(C.Qt.Horizontal)
+        self.volumn_slider.setMaximum(100)
+        self.volumn_slider.setMinimum(0)
+        self.volumn_slider.setValue(50)
+        self.volumn_slider.setTickPosition(QtWidgets.QSlider.TicksRight)
+        self.volumn_slider.setTickInterval(10)
 
-        self.seekSlider = QtWidgets.QSlider()
-        self.seekSlider.setMinimum(0)
-        self.seekSlider.setMaximum(100)
-        #self.seekSlider.setRange(-10, self.player.duration() / 1000)
-        max = self.seekSlider.maximum()
-        print(max)
-        self.seekSlider.setOrientation(C.Qt.Horizontal)
-        self.seekSlider.setTracking(False)
-        seekSliderLabel1 = QtWidgets.QLabel('0.00')
-        seekSliderLabel2 = QtWidgets.QLabel('0.00')
-
-        self.set_playlist()
-        self.volume_change()
+        #self.list_view = QtWidgets.QListView(self.all_songs)
 
         h_box = QtWidgets.QHBoxLayout()
         v_box = QtWidgets.QVBoxLayout()
-        self.h_box4 = QtWidgets.QHBoxLayout()
 
         #h_box.addWidget(backGround)
 
         v_box.addWidget(self.all_song_button)
         v_box.addWidget(self.playlists_scroll_area)
         v_box.addWidget(self.current_song_area)
-
-        self.h_box4.addWidget(seekSliderLabel1)
-        self.h_box4.addWidget(self.seekSlider)
-        self.h_box4.addWidget(seekSliderLabel2)
 
         h_box.addLayout(v_box)
 
@@ -104,35 +88,37 @@ class Window(QtWidgets.QWidget):
         h_box1.addWidget(self.play_button)
         h_box1.addWidget(self.next_button)
 
-        v_box3 = QtWidgets.QVBoxLayout()
-        v_box3.addWidget(self.slider)
-        h_box1.addLayout(v_box3)
+        h_box3 = QtWidgets.QHBoxLayout()
+        h_box3.addWidget(self.min_volumn)
+        h_box3.addWidget(self.volumn_slider)
+        h_box3.addWidget(self.max_volumn)
 
         h_box2 = QtWidgets.QHBoxLayout()
         h_box2.addWidget(self.search_button)
 
         v_box1.addLayout(h_box2)
         v_box1.addLayout(v_box2)
-        v_box1.addLayout(self.h_box4)
         v_box1.addLayout(h_box1)
+        v_box1.addLayout(h_box3)
 
         self.setLayout(h_box)
 
         self.setWindowTitle("Music Player")
         self.setGeometry(100, 100, 800, 600)
         self.show()
+
         self.play_button.setShortcut(' ')
-        self.next_button.setShortcut('Ctrl+Right')
-        self.prev_button.setShortcut('Ctrl+Left')
+        self.next_button.setShortcut('Alt+Right')
+        self.prev_button.setShortcut('Alt+Left')
         self.play_button.clicked.connect(self.play)
         self.next_button.clicked.connect(self.next)
         self.prev_button.clicked.connect(self.back)
         self.shuffle_button.clicked.connect(self.shuffle)
         self.search_button.clicked.connect(self.search)
-        self.slider.valueChanged.connect(self.volume_change)
-        self.player.positionChanged.connect(self.qmp_positionChanged)
-        self.player.durationChanged.connect(self.change_duration)
+        self.volumn_slider.valueChanged.connect(self.volume_change)
+        self.all_song_button.clicked.connect(self.load_songs)
 
+        self.shuffled = False
 
     def change_duration(self):
         self.seekSlider.setRange(0, self.player.duration())
@@ -231,5 +217,18 @@ class Window(QtWidgets.QWidget):
         self.player.setVolume(numb)
         self.player2.setVolume(numb)
 
+    def display_song_list(self, list_of_songs):
+        s='Songs:\n\n'
+        for item in list_of_songs:
+            i = item.replace("C:/Users/Nhu/Music/", "")
+            s += (str(i[:-4]) + '\n')
+        self.songs.setText(s)
+
     def search(self):
-        pass
+        s_term = self.line_edit.text()
+        filtered_list_of_songs = []
+        # search trhough each song in all_songs...if it matches add to filtered_list_of_songs
+        for song in self.all_songs:
+            if  song.lower().find(s_term.lower()) > -1:
+                filtered_list_of_songs.append(song)
+        self.display_song_list(filtered_list_of_songs)
