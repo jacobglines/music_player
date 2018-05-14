@@ -19,8 +19,8 @@ class Window(QtWidgets.QWidget):
         self.prev_button = QtWidgets.QPushButton()
         self.prev_button.setIcon(self.style().standardIcon(QStyle.SP_MediaSeekBackward))
         self.shuffle_button = QtWidgets.QPushButton("🔀")
-        self.min_volumn = QtWidgets.QLabel("🔈")
-        self.max_volumn = QtWidgets.QLabel("🔊")
+        self.min_volume = QtWidgets.QLabel("🔈")
+        self.max_volume = QtWidgets.QLabel("🔊")
         self.l_playlists = QtWidgets.QLabel("Playlists:")
         self.l_current_song = QtWidgets.QLabel("Current song:")
 
@@ -54,13 +54,13 @@ class Window(QtWidgets.QWidget):
         self.current_song_area = QtWidgets.QScrollArea()
         self.current_song_area.setWidget(self.l_current_song)
 
-        #set volumn slider
-        self.volumn_slider = QtWidgets.QSlider(C.Qt.Horizontal)
-        self.volumn_slider.setMaximum(100)
-        self.volumn_slider.setMinimum(0)
-        self.volumn_slider.setValue(50)
-        self.volumn_slider.setTickPosition(QtWidgets.QSlider.TicksRight)
-        self.volumn_slider.setTickInterval(10)
+        #set volume slider
+        self.volume_slider = QtWidgets.QSlider(C.Qt.Horizontal)
+        self.volume_slider.setMaximum(100)
+        self.volume_slider.setMinimum(0)
+        self.volume_slider.setValue(50)
+        self.volume_slider.setTickPosition(QtWidgets.QSlider.TicksRight)
+        self.volume_slider.setTickInterval(10)
 
         #self.list_view = QtWidgets.QListView(self.all_songs)
 
@@ -90,9 +90,9 @@ class Window(QtWidgets.QWidget):
         h_box1.addWidget(self.next_button)
 
         h_box3 = QtWidgets.QHBoxLayout()
-        h_box3.addWidget(self.min_volumn)
-        h_box3.addWidget(self.volumn_slider)
-        h_box3.addWidget(self.max_volumn)
+        h_box3.addWidget(self.min_volume)
+        h_box3.addWidget(self.volume_slider)
+        h_box3.addWidget(self.max_volume)
 
         h_box2 = QtWidgets.QHBoxLayout()
         h_box2.addWidget(self.search_button)
@@ -116,7 +116,7 @@ class Window(QtWidgets.QWidget):
         self.prev_button.clicked.connect(self.back)
         self.shuffle_button.clicked.connect(self.shuffle)
         self.search_button.clicked.connect(self.search)
-        self.volumn_slider.valueChanged.connect(self.volume_change)
+        self.volume_slider.valueChanged.connect(self.volume_change)
         self.all_song_button.clicked.connect(self.load_songs)
 
         self.shuffled = False
@@ -218,7 +218,7 @@ class Window(QtWidgets.QWidget):
             self.shuffled = False
 
     def volume_change(self):
-        numb = self.slider.value()
+        numb = self.volume_slider.value()
         self.player.setVolume(numb)
         self.player2.setVolume(numb)
 
