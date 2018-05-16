@@ -9,6 +9,11 @@ class Window(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
         self.user_interface()
+        
+    def item_click(self, item):
+        pass
+    def item_doubleclick(self, item):
+        pass
 
     def user_interface(self):
         self.all_song_button = QtWidgets.QPushButton("All songs")
@@ -27,7 +32,16 @@ class Window(QtWidgets.QWidget):
         self.songs = QtWidgets.QLabel("Songs:\n")
 
         self.all_songs = self.load_songs()
+        self.view = QListWidget()
 
+
+        for song in self.all_songs:
+            song = song.replace("C:/Users/Nhu/Music/", "")
+            self.view.addItem(song)
+        self.view.adjustSize()
+        self.view.itemClicked.connect(self.item_click)
+        self.view.itemDoubleClicked.connect(self.item_doubleclick)
+        
         self.set_playlist()
 
         self.line_edit = QtWidgets.QLineEdit()
@@ -36,12 +50,8 @@ class Window(QtWidgets.QWidget):
 
         #scroll are for list of songs
         self.songs_scroll_area = QtWidgets.QScrollArea()
-        self.songs_scroll_area.setWidget(self.songs)
-        self.songs_scroll_bar = QtWidgets.QScrollBar()
-        self.songs_scroll_area.setVerticalScrollBar(self.songs_scroll_bar)
-        self.songs_scroll_area.setVerticalScrollBarPolicy(C.Qt.ScrollBarAlwaysOn)
+        self.songs_scroll_area.setWidget(self.view)
         self.songs_scroll_area.setWidgetResizable(True)
-        self.songs_scroll_area.setAlignment(C.Qt.AlignTop)
 
         #scroll area for list of playlists
         self.playlists_scroll_area = QtWidgets.QScrollArea()
@@ -140,9 +150,15 @@ class Window(QtWidgets.QWidget):
         self.player.currentMediaChanged.connect(self.current_song)
         self.player.positionChanged.connect(self.qmp_positionChanged)
         self.player.durationChanged.connect(self.change_duration)
+        self.all_song_button.clicked.connect(self.show_all_songs)
         
         self.shuffled = False
-
+        
+    def show_all_songs(self):
+        for song in self.all_songs:
+            song = song.replace("C:/Users/Nhu/Music/", "")
+            self.view.addItem(song)
+            
     def current_song(self, media):
         name = media.canonicalUrl()
         name = name.toString()
