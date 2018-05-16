@@ -2,16 +2,23 @@ from PyQt5 import QtWidgets
 import PyQt5.QtCore as C
 import PyQt5.QtMultimedia as M
 import os
-from PyQt5.QtWidgets import QStyle
+from PyQt5.QtWidgets import QStyle, QListWidget
+
 
 class Window(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
         self.user_interface()
-        
+
     def item_click(self, item):
-        pass
+        number = self.view.currentRow()
+        if self.shuffled == False:
+            self.playlist.setCurrentIndex(number)
+            self.player.play()
+        elif self.shuffled == True:
+            pass
+
     def item_doubleclick(self, item):
         pass
 
@@ -31,40 +38,40 @@ class Window(QtWidgets.QWidget):
 
         self.songs = QtWidgets.QLabel("Songs:\n")
 
-        self.all_songs = self.load_songs()
         self.view = QListWidget()
+        self.viewPlaylists = QListWidget()
+        self.all_songs = self.load_songs()
+        self.load_playlists()
+        self.viewPlaylists.adjustSize()
 
-
-        for song in self.all_songs:
-            song = song.replace("C:/Users/Nhu/Music/", "")
-            self.view.addItem(song)
         self.view.adjustSize()
         self.view.itemClicked.connect(self.item_click)
         self.view.itemDoubleClicked.connect(self.item_doubleclick)
-        
+
         self.set_playlist()
 
         self.line_edit = QtWidgets.QLineEdit()
         self.line_edit.setText("")
         self.search_button = QtWidgets.QPushButton("search")
 
-        #scroll are for list of songs
+        # scroll are for list of songs
         self.songs_scroll_area = QtWidgets.QScrollArea()
         self.songs_scroll_area.setWidget(self.view)
         self.songs_scroll_area.setWidgetResizable(True)
 
-        #scroll area for list of playlists
+        # scroll area for list of playlists
         self.playlists_scroll_area = QtWidgets.QScrollArea()
-        self.playlists_scroll_area.setWidget(self.l_playlists)
-        self.playlists_scroll_bar = QtWidgets.QScrollBar()
-        self.playlists_scroll_area.setVerticalScrollBar(self.playlists_scroll_bar)
-        self.playlists_scroll_area.setVerticalScrollBarPolicy(C.Qt.ScrollBarAlwaysOn)
+        self.playlists_scroll_area.setWidget(self.viewPlaylists)
+        self.playlists_scroll_area.setWidgetResizable(True)
+        # self.playlists_scroll_bar = QtWidgets.QScrollBar()
+        # self.playlists_scroll_area.setVerticalScrollBar(self.playlists_scroll_bar)
+        # self.playlists_scroll_area.setVerticalScrollBarPolicy(C.Qt.ScrollBarAlwaysOn)
 
-        #set area for current song box
+        # set area for current song box
         self.current_song_area = QtWidgets.QScrollArea()
         self.current_song_area.setWidget(self.l_current_song)
 
-        #set volumn slider
+        # set volumn slider
         self.volumn_slider = QtWidgets.QSlider(C.Qt.Horizontal)
         self.volumn_slider.setMaximum(100)
         self.volumn_slider.setMinimum(0)
@@ -84,13 +91,13 @@ class Window(QtWidgets.QWidget):
         self.set_playlist()
         self.volume_change()
 
-        #self.list_view = QtWidgets.QListView(self.all_songs)
+        # self.list_view = QtWidgets.QListView(self.all_songs)
 
         h_box = QtWidgets.QHBoxLayout()
         v_box = QtWidgets.QVBoxLayout()
         self.h_box4 = QtWidgets.QHBoxLayout()
 
-        #h_box.addWidget(backGround)
+        # h_box.addWidget(backGround)
 
         v_box.addWidget(self.all_song_button)
         v_box.addWidget(self.playlists_scroll_area)
@@ -151,14 +158,21 @@ class Window(QtWidgets.QWidget):
         self.player.positionChanged.connect(self.qmp_positionChanged)
         self.player.durationChanged.connect(self.change_duration)
         self.all_song_button.clicked.connect(self.show_all_songs)
-        
+
         self.shuffled = False
-        
+
+    def load_playlists(self):
+        root = C.QFileInfo(__file__).absolutePath()
+        songs = os.listdir(root + "/songs")
+        for item in songs:
+            if str(item[-4:]) == '.m3u':
+                self.viewPlaylists.addItem(item[:-4])
+
     def show_all_songs(self):
         for song in self.all_songs:
             song = song.replace("C:/Users/Nhu/Music/", "")
             self.view.addItem(song)
-            
+
     def current_song(self, media):
         name = media.canonicalUrl()
         name = name.toString()
@@ -176,12 +190,14 @@ class Window(QtWidgets.QWidget):
             sliderLayout = self.h_box4.layout()
             sliderLayout.itemAt(0).widget().setText('%d:%02d' % (int(position / 60000), int((position / 1000) % 60)))
             self.seekSlider.setValue(position / 1000)
-            sliderLayout.itemAt(2).widget().setText('%d:%02d' % (int(self.player.duration() / 60000), int((self.player.duration() / 1000) % 60)))
+            sliderLayout.itemAt(2).widget().setText(
+                '%d:%02d' % (int(self.player.duration() / 60000), int((self.player.duration() / 1000) % 60)))
         elif self.shuffled == True:
             sliderLayout = self.h_box4.layout()
             sliderLayout.itemAt(0).widget().setText('%d:%02d' % (int(position / 60000), int((position / 1000) % 60)))
             self.seekSlider.setValue(position / 1000)
-            sliderLayout.itemAt(2).widget().setText('%d:%02d' % (int(self.player.duration() / 60000), int((self.player.duration() / 1000) % 60)))
+            sliderLayout.itemAt(2).widget().setText(
+                '%d:%02d' % (int(self.player.duration() / 60000), int((self.player.duration() / 1000) % 60)))
 
     def load_songs(self):
         songList = []
@@ -189,8 +205,8 @@ class Window(QtWidgets.QWidget):
         root = C.QFileInfo(__file__).absolutePath()
         songs = os.listdir(root + "/songs")
         for item in songs:
-            print(item)
             s += (str(item[:-4]) + '\n')
+            self.view.addItem(str(item[:-4]))
             song = (root + '/songs/' + item + '\n')
             songList.append(song)
         self.songs.setText(s)
@@ -256,7 +272,6 @@ class Window(QtWidgets.QWidget):
             self.player2.play()
             self.shuffled = True
         elif self.shuffled == True:
-            print('hello')
             self.player2.stop()
             self.playlist.setCurrentIndex(0)
             self.player.play()
