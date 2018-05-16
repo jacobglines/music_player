@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets
 import PyQt5.QtCore as C
 import PyQt5.QtMultimedia as M
 import os
-from PyQt5.QtWidgets import QStyle, QListWidget
+from PyQt5.QtWidgets import QStyle, QListWidget, QAction, QInputDialog, QLineEdit
 
 
 class Window(QtWidgets.QWidget):
@@ -20,7 +20,15 @@ class Window(QtWidgets.QWidget):
             pass
 
     def item_doubleclick(self, item):
-        pass
+        self.current_item = item
+        menu = QtWidgets.QMenu()
+        createPlaylist = QAction('Create New Playlist')
+        createPlaylist.triggered.connect(self.create_playlist)
+        menu.addAction(createPlaylist)
+        addToPlaylist = QAction('Add To Playlist')
+        addToPlaylist.triggered.connect(self.add_to_playlist)
+        menu.addAction(addToPlaylist)
+        menu.exec_()
 
     def user_interface(self):
         self.all_song_button = QtWidgets.QPushButton("All songs")
@@ -41,12 +49,14 @@ class Window(QtWidgets.QWidget):
         self.view = QListWidget()
         self.viewPlaylists = QListWidget()
         self.all_songs = self.load_songs()
-        self.load_playlists()
+        self.all_playlists = self.load_playlists()
         self.viewPlaylists.adjustSize()
 
         self.view.adjustSize()
         self.view.itemClicked.connect(self.item_click)
         self.view.itemDoubleClicked.connect(self.item_doubleclick)
+
+        self.view.installEventFilter(self)
 
         self.set_playlist()
 
@@ -157,21 +167,50 @@ class Window(QtWidgets.QWidget):
         self.player.currentMediaChanged.connect(self.current_song)
         self.player.positionChanged.connect(self.qmp_positionChanged)
         self.player.durationChanged.connect(self.change_duration)
-        self.all_song_button.clicked.connect(self.show_all_songs)
+        # self.all_song_button.clicked.connect(self.show_all_songs)
 
         self.shuffled = False
 
+
+    def add_to_playlist(self):
+        menu = QtWidgets.QMenu()
+        
+
+    def create_playlist(self):
+        root = C.QFileInfo(__file__).absolutePath()
+        spot = (root + '/songs/')
+        playlistName = self.getText()
+        completeName = os.path.join(spot, f'{playlistName}.m3u')
+        file = open(completeName, 'w')
+        file.close()
+        self.all_playlists.clear()
+        self.playlists_scroll_area.update()
+        self.all_playlists = self.load_playlists()
+        self.playlists_scroll_area.update()
+
+    def getText(self):
+        text, okPressed = QInputDialog.getText(self, "New Playlist", "Playlist Name:", QLineEdit.Normal, "")
+        if okPressed and text != '':
+            return text
+
     def load_playlists(self):
+        playlists = []
         root = C.QFileInfo(__file__).absolutePath()
         songs = os.listdir(root + "/songs")
         for item in songs:
             if str(item[-4:]) == '.m3u':
                 self.viewPlaylists.addItem(item[:-4])
+                print(root + "/songs" + item)
+                playlists.append(root + "/songs" + item)
+        return playlists
+
 
     def show_all_songs(self):
-        for song in self.all_songs:
-            song = song.replace("C:/Users/Nhu/Music/", "")
-            self.view.addItem(song)
+        root = C.QFileInfo(__file__).absolutePath()
+        songs = os.listdir(root + "/songs")
+        for item in songs:
+            if item[-4:] != '.m3u':
+                self.view.addItem(str(item[:-4]))
 
     def current_song(self, media):
         name = media.canonicalUrl()
@@ -205,10 +244,11 @@ class Window(QtWidgets.QWidget):
         root = C.QFileInfo(__file__).absolutePath()
         songs = os.listdir(root + "/songs")
         for item in songs:
-            s += (str(item[:-4]) + '\n')
-            self.view.addItem(str(item[:-4]))
-            song = (root + '/songs/' + item + '\n')
-            songList.append(song)
+            if item[-4:] != '.m3u':
+                s += (str(item[:-4]) + '\n')
+                self.view.addItem(str(item[:-4]))
+                song = (root + '/songs/' + item + '\n')
+                songList.append(song)
         self.songs.setText(s)
         return songList
 
