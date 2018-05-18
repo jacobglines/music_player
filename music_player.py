@@ -2,33 +2,25 @@ from PyQt5 import QtWidgets
 import PyQt5.QtCore as C
 import PyQt5.QtMultimedia as M
 import os
-from PyQt5.QtWidgets import QStyle, QListWidget, QAction, QInputDialog, QLineEdit
+from PyQt5.QtWidgets import QStyle, QListWidget
 
 
 class Window(QtWidgets.QWidget):
-
-    def __init__(self, parent=None):
-        super(Window, self).__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.user_interface()
 
-    def item_click(self, item):
+    def item_click(self):
         number = self.view.currentRow()
         if self.shuffled == False:
             self.playlist.setCurrentIndex(number)
+            self.play_button.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
             self.player.play()
         elif self.shuffled == True:
             pass
 
     def item_doubleclick(self, item):
-        self.current_item = item
-        menu = QtWidgets.QMenu()
-        createPlaylist = QAction('Create New Playlist')
-        createPlaylist.triggered.connect(self.create_playlist)
-        menu.addAction(createPlaylist)
-        addToPlaylist = QAction('Add To Playlist')
-        addToPlaylist.triggered.connect(self.add_to_playlist)
-        menu.addAction(addToPlaylist)
-        menu.exec_()
+        pass
 
     def user_interface(self):
         self.all_song_button = QtWidgets.QPushButton("All songs")
@@ -39,24 +31,26 @@ class Window(QtWidgets.QWidget):
         self.prev_button = QtWidgets.QPushButton()
         self.prev_button.setIcon(self.style().standardIcon(QStyle.SP_MediaSeekBackward))
         self.shuffle_button = QtWidgets.QPushButton("🔀")
-        self.min_volumn = QtWidgets.QLabel("🔈")
-        self.max_volumn = QtWidgets.QLabel("🔊")
+        self.min_volume = QtWidgets.QLabel("🔈")
+        self.max_volume = QtWidgets.QLabel("🔊")
         self.l_playlists = QtWidgets.QLabel("Playlists:")
         self.l_current_song = QtWidgets.QLabel("Current song:")
 
         self.songs = QtWidgets.QLabel("Songs:\n")
-
         self.view = QListWidget()
-        self.viewPlaylists = QListWidget()
         self.all_songs = self.load_songs()
-        self.all_playlists = self.load_playlists()
+
+        for song in self.all_songs:
+            song = song.replace("C:/Users/Nhu/Music/", "")
+            self.view.addItem(song)
+            self.view.adjustSize()
+
+        self.viewPlaylists = QListWidget()
+        self.load_playlists()
         self.viewPlaylists.adjustSize()
 
-        self.view.adjustSize()
         self.view.itemClicked.connect(self.item_click)
         self.view.itemDoubleClicked.connect(self.item_doubleclick)
-
-        self.view.installEventFilter(self)
 
         self.set_playlist()
 
@@ -64,30 +58,25 @@ class Window(QtWidgets.QWidget):
         self.line_edit.setText("")
         self.search_button = QtWidgets.QPushButton("search")
 
-        # scroll are for list of songs
         self.songs_scroll_area = QtWidgets.QScrollArea()
         self.songs_scroll_area.setWidget(self.view)
         self.songs_scroll_area.setWidgetResizable(True)
 
-        # scroll area for list of playlists
         self.playlists_scroll_area = QtWidgets.QScrollArea()
         self.playlists_scroll_area.setWidget(self.viewPlaylists)
         self.playlists_scroll_area.setWidgetResizable(True)
-        # self.playlists_scroll_bar = QtWidgets.QScrollBar()
-        # self.playlists_scroll_area.setVerticalScrollBar(self.playlists_scroll_bar)
-        # self.playlists_scroll_area.setVerticalScrollBarPolicy(C.Qt.ScrollBarAlwaysOn)
 
         # set area for current song box
         self.current_song_area = QtWidgets.QScrollArea()
         self.current_song_area.setWidget(self.l_current_song)
 
-        # set volumn slider
-        self.volumn_slider = QtWidgets.QSlider(C.Qt.Horizontal)
-        self.volumn_slider.setMaximum(100)
-        self.volumn_slider.setMinimum(0)
-        self.volumn_slider.setValue(50)
-        self.volumn_slider.setTickPosition(QtWidgets.QSlider.TicksRight)
-        self.volumn_slider.setTickInterval(10)
+        # set volume slider
+        self.volume_slider = QtWidgets.QSlider(C.Qt.Horizontal)
+        self.volume_slider.setMaximum(100)
+        self.volume_slider.setMinimum(0)
+        self.volume_slider.setValue(50)
+        self.volume_slider.setTickPosition(QtWidgets.QSlider.TicksRight)
+        self.volume_slider.setTickInterval(10)
 
         self.seekSlider = QtWidgets.QSlider()
         self.seekSlider.setMinimum(0)
@@ -134,9 +123,9 @@ class Window(QtWidgets.QWidget):
         h_box1.addWidget(self.next_button)
 
         h_box3 = QtWidgets.QHBoxLayout()
-        h_box3.addWidget(self.min_volumn)
-        h_box3.addWidget(self.volumn_slider)
-        h_box3.addWidget(self.max_volumn)
+        h_box3.addWidget(self.min_volume)
+        h_box3.addWidget(self.volume_slider)
+        h_box3.addWidget(self.max_volume)
 
         h_box2 = QtWidgets.QHBoxLayout()
         h_box2.addWidget(self.search_button)
@@ -162,55 +151,30 @@ class Window(QtWidgets.QWidget):
         self.prev_button.clicked.connect(self.back)
         self.shuffle_button.clicked.connect(self.shuffle)
         self.search_button.clicked.connect(self.search)
-        self.volumn_slider.valueChanged.connect(self.volume_change)
+        self.volume_slider.valueChanged.connect(self.volume_change)
         self.all_song_button.clicked.connect(self.load_songs)
         self.player.currentMediaChanged.connect(self.current_song)
         self.player.positionChanged.connect(self.qmp_positionChanged)
         self.player.durationChanged.connect(self.change_duration)
-        # self.all_song_button.clicked.connect(self.show_all_songs)
+        self.all_song_button.clicked.connect(self.show_all_songs)
 
         self.shuffled = False
 
-
-    def add_to_playlist(self):
-        menu = QtWidgets.QMenu()
-        
-
-    def create_playlist(self):
-        root = C.QFileInfo(__file__).absolutePath()
-        spot = (root + '/songs/')
-        playlistName = self.getText()
-        completeName = os.path.join(spot, f'{playlistName}.m3u')
-        file = open(completeName, 'w')
-        file.close()
-        self.all_playlists.clear()
-        self.playlists_scroll_area.update()
-        self.all_playlists = self.load_playlists()
-        self.playlists_scroll_area.update()
-
-    def getText(self):
-        text, okPressed = QInputDialog.getText(self, "New Playlist", "Playlist Name:", QLineEdit.Normal, "")
-        if okPressed and text != '':
-            return text
-
     def load_playlists(self):
-        playlists = []
-        root = C.QFileInfo(__file__).absolutePath()
-        songs = os.listdir(root + "/songs")
+        songs = os.listdir("C:/Users/Nhu/Music/")
         for item in songs:
             if str(item[-4:]) == '.m3u':
                 self.viewPlaylists.addItem(item[:-4])
-                print(root + "/songs" + item)
-                playlists.append(root + "/songs" + item)
-        return playlists
-
 
     def show_all_songs(self):
-        root = C.QFileInfo(__file__).absolutePath()
-        songs = os.listdir(root + "/songs")
-        for item in songs:
-            if item[-4:] != '.m3u':
-                self.view.addItem(str(item[:-4]))
+        self.view.clear()
+        self.playlist.clear()
+        for song in self.all_songs:
+            url = C.QUrl.fromLocalFile(song)
+            content = M.QMediaContent(url)
+            self.playlist.addMedia(content)
+            song = song.replace("C:/Users/Nhu/Music/", "")
+            self.view.addItem(song)
 
     def current_song(self, media):
         name = media.canonicalUrl()
@@ -241,13 +205,12 @@ class Window(QtWidgets.QWidget):
     def load_songs(self):
         songList = []
         s = 'Songs:\n\n'
-        root = C.QFileInfo(__file__).absolutePath()
-        songs = os.listdir(root + "/songs")
+        songs = os.listdir("C:/Users/Nhu/Music/")
         for item in songs:
-            if item[-4:] != '.m3u':
-                s += (str(item[:-4]) + '\n')
+            if item.endswith(".mp3"):
+                s += (str(item[:-4]) )
                 self.view.addItem(str(item[:-4]))
-                song = (root + '/songs/' + item + '\n')
+                song = ("C:/Users/Nhu/Music/" + item )
                 songList.append(song)
         self.songs.setText(s)
         return songList
@@ -258,7 +221,7 @@ class Window(QtWidgets.QWidget):
         self.playlist = M.QMediaPlaylist(self.player)
         self.playlist2 = M.QMediaPlaylist(self.player2)
         for song in self.all_songs:
-            url = C.QUrl.fromLocalFile(song[:-1])
+            url = C.QUrl.fromLocalFile(song)
             content = M.QMediaContent(url)
             self.playlist.addMedia(content)
             self.playlist2.addMedia(content)
@@ -318,23 +281,29 @@ class Window(QtWidgets.QWidget):
             self.shuffled = False
 
     def volume_change(self):
-        numb = self.volumn_slider.value()
+        numb = self.volume_slider.value()
         self.player.setVolume(numb)
         self.player2.setVolume(numb)
 
     def display_song_list(self, list_of_songs):
-        s = 'Songs:\n\n'
+        self.view.clear()
+        self.playlist.clear()
         for item in list_of_songs:
-            s += (str(item[:-4]) + '\n')
-        self.songs.setText(s)
+            url = C.QUrl.fromLocalFile(item)
+            content = M.QMediaContent(url)
+            self.playlist.addMedia(content)
+            song = item.replace("C:/Users/Nhu/Music/", "")
+            song = song.replace("\n","")
+            self.view.addItem(song)
 
     def search(self):
         s_term = self.line_edit.text()
-        filtered_list_of_songs = []
-        root = C.QFileInfo(__file__).absolutePath()
-        songs = os.listdir(root + "/songs")
+        print(s_term)
+        self.filtered_list_of_songs =[]
         # search through each song in all_songs...if it matches add to filtered_list_of_songs
-        for song in songs:
+        for song in self.all_songs:
             if song.lower().find(s_term.lower()) > -1:
-                filtered_list_of_songs.append(song)
-        self.display_song_list(filtered_list_of_songs)
+                self.filtered_list_of_songs.append(song)
+        self.display_song_list(self.filtered_list_of_songs)
+
+
